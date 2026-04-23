@@ -1,0 +1,723 @@
+{
+  "meta": {
+    "id": "employee-reflection-tree-v1",
+    "title": "End-of-Day Reflection Tree",
+    "description": "A fully deterministic decision tree walking employees through three psychological axes: Locus of Control, Contribution vs Entitlement, and Radius of Concern.",
+    "axes": [
+      { "id": 1, "name": "Locus", "spectrum": "Victim → Victor" },
+      { "id": 2, "name": "Orientation", "spectrum": "Entitlement → Contribution" },
+      { "id": 3, "name": "Radius", "spectrum": "Self-Centrism → Altrocentrism" }
+    ],
+    "version": "1.0",
+    "branching_rule": "4 options per question collapse into 2 psychological groups → 2 branches. Some nodes are pass-throughs that store state without branching."
+  },
+
+  "nodes": {
+
+    "A1-Q1": {
+      "axis": 1,
+      "type": "question",
+      "label": "Entry — Attribution Anchor",
+      "text": "When things didn't go your way today, which of these felt most true in the moment?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I probably could have done something differently",
+          "group": "INTERNAL",
+          "state_update": { "A1_Q1_raw": "A", "A1_branch": "INTERNAL", "A1_attribution": "EFFORT" },
+          "next": "A1-Q2i"
+        },
+        {
+          "id": "B",
+          "text": "The situation just wasn't set up for success",
+          "group": "EXTERNAL",
+          "state_update": { "A1_Q1_raw": "B", "A1_branch": "EXTERNAL", "A1_attribution": "TASK" },
+          "next": "A1-Q2e"
+        },
+        {
+          "id": "C",
+          "text": "I kept going — I knew effort would get me through",
+          "group": "INTERNAL",
+          "state_update": { "A1_Q1_raw": "C", "A1_branch": "INTERNAL", "A1_attribution": "EFFORT" },
+          "next": "A1-Q2i"
+        },
+        {
+          "id": "D",
+          "text": "I felt like no matter what I did, the outcome was already decided",
+          "group": "EXTERNAL",
+          "state_update": { "A1_Q1_raw": "D", "A1_branch": "EXTERNAL", "A1_attribution": "LUCK" },
+          "next": "A1-Q2e"
+        }
+      ],
+      "branch_logic": "A+C → INTERNAL → A1-Q2i | B+D → EXTERNAL → A1-Q2e"
+    },
+
+    "A1-Q2i": {
+      "axis": 1,
+      "type": "question",
+      "label": "Internal Branch — Success Attribution",
+      "text": "When you succeeded at something today — even something small — what do you think made it happen?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I prepared well or put in real effort before it",
+          "group": "EFFORT",
+          "state_update": { "A1_Q2_raw": "A", "A1_success_attribution": "EFFORT" },
+          "next": "A1-Q3i-effort"
+        },
+        {
+          "id": "B",
+          "text": "It played to something I'm naturally good at",
+          "group": "ABILITY",
+          "state_update": { "A1_Q2_raw": "B", "A1_success_attribution": "ABILITY" },
+          "next": "A1-Q3i-ability"
+        },
+        {
+          "id": "C",
+          "text": "Honestly, the conditions were just favorable today",
+          "group": "DRIFT",
+          "state_update": { "A1_Q2_raw": "C", "A1_success_attribution": "EXTERNAL_DRIFT" },
+          "next": "A1-Q3e"
+        },
+        {
+          "id": "D",
+          "text": "I'm not sure — it came together but I don't fully know why",
+          "group": "DRIFT",
+          "state_update": { "A1_Q2_raw": "D", "A1_success_attribution": "UNCERTAIN" },
+          "next": "A1-Q3e"
+        }
+      ],
+      "branch_logic": "A → A1-Q3i-effort | B → A1-Q3i-ability | C+D → A1-Q3e",
+      "note": "C+D: self-identifies as internal but attributes success externally — fixed mindset signal"
+    },
+
+    "A1-Q3i-effort": {
+      "axis": 1,
+      "type": "question",
+      "label": "Effort Branch — Expectancy Shift",
+      "text": "If tomorrow's work is harder than today's, what's your honest expectation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I'll push harder — effort is what got me here",
+          "group": "TYPICAL_POSITIVE",
+          "state_update": { "A1_Q3_raw": "A", "A1_expectancy": "TYPICAL_POSITIVE" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTOR-EFFORT"
+        },
+        {
+          "id": "B",
+          "text": "I'll probably do about the same — I know my pace",
+          "group": "TYPICAL_STABLE",
+          "state_update": { "A1_Q3_raw": "B", "A1_expectancy": "TYPICAL_STABLE" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTOR-EFFORT"
+        },
+        {
+          "id": "C",
+          "text": "I'm not sure — it depends on too many things outside me",
+          "group": "ATYPICAL",
+          "state_update": { "A1_Q3_raw": "C", "A1_expectancy": "ATYPICAL_UNCERTAIN" },
+          "next": "A1-EXIT",
+          "exit_state": "INTERNAL-UNCERTAIN"
+        },
+        {
+          "id": "D",
+          "text": "Harder tasks usually mean worse outcomes for me",
+          "group": "ATYPICAL",
+          "state_update": { "A1_Q3_raw": "D", "A1_expectancy": "ATYPICAL_NEGATIVE" },
+          "next": "A1-EXIT",
+          "exit_state": "INTERNAL-UNCERTAIN"
+        }
+      ],
+      "branch_logic": "A+B → VICTOR-EFFORT | C+D → INTERNAL-UNCERTAIN"
+    },
+
+    "A1-Q3i-ability": {
+      "axis": 1,
+      "type": "question",
+      "label": "Ability Branch — Feedback Orientation",
+      "text": "When you got feedback on your work recently, what was your first instinct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I wanted to understand it so I could improve",
+          "group": "GROWTH",
+          "state_update": { "A1_Q3_raw": "A", "A1_feedback_orientation": "GROWTH_OPEN" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTOR-GROWTH"
+        },
+        {
+          "id": "B",
+          "text": "I appreciated it but didn't feel I needed to change much",
+          "group": "FIXED",
+          "state_update": { "A1_Q3_raw": "B", "A1_feedback_orientation": "FIXED_RESISTANT" },
+          "next": "A1-EXIT",
+          "exit_state": "FIXED-MINDSET"
+        },
+        {
+          "id": "C",
+          "text": "It felt unnecessary — I know my own strengths",
+          "group": "FIXED",
+          "state_update": { "A1_Q3_raw": "C", "A1_feedback_orientation": "FIXED_DISMISSIVE" },
+          "next": "A1-EXIT",
+          "exit_state": "FIXED-MINDSET"
+        },
+        {
+          "id": "D",
+          "text": "It was hard to hear, even if it was fair",
+          "group": "GROWTH",
+          "state_update": { "A1_Q3_raw": "D", "A1_feedback_orientation": "GROWTH_UNCOMFORTABLE" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTOR-GROWTH"
+        }
+      ],
+      "branch_logic": "A+D → VICTOR-GROWTH | B+C → FIXED-MINDSET"
+    },
+
+    "A1-Q2e": {
+      "axis": 1,
+      "type": "question",
+      "label": "External Branch — Attribution Subtype",
+      "text": "When something went wrong today, how did you explain it to yourself?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The task itself was set up in a way that made success unlikely",
+          "group": "SITUATIONAL",
+          "state_update": { "A1_Q2_raw": "A", "A1_external_type": "TASK_DIFFICULTY" },
+          "next": "A1-Q3e-situational"
+        },
+        {
+          "id": "B",
+          "text": "Timing and circumstances just weren't on my side",
+          "group": "SITUATIONAL",
+          "state_update": { "A1_Q2_raw": "B", "A1_external_type": "LUCK_FATE" },
+          "next": "A1-Q3e-situational"
+        },
+        {
+          "id": "C",
+          "text": "Other people didn't do what I needed them to do",
+          "group": "PERSONAL",
+          "state_update": { "A1_Q2_raw": "C", "A1_external_type": "SOCIAL_BLAME" },
+          "next": "A1-Q3e-personal"
+        },
+        {
+          "id": "D",
+          "text": "I'm not sure I'm the right fit for this kind of work",
+          "group": "PERSONAL",
+          "state_update": { "A1_Q2_raw": "D", "A1_external_type": "ABILITY_SELF_DOUBT" },
+          "next": "A1-Q3e-personal"
+        }
+      ],
+      "branch_logic": "A+B → SITUATIONAL → A1-Q3e-situational | C+D → PERSONAL → A1-Q3e-personal"
+    },
+
+    "A1-Q3e": {
+      "axis": 1,
+      "type": "question",
+      "label": "Drift Catch — Agency Probe",
+      "text": "If the same situation came up again tomorrow, what would you expect?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Same result — the conditions haven't changed",
+          "group": "FATALISTIC",
+          "state_update": { "A1_Q3_raw": "A" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-STABLE"
+        },
+        {
+          "id": "B",
+          "text": "It might go differently — these things are unpredictable",
+          "group": "UNCERTAIN",
+          "state_update": { "A1_Q3_raw": "B" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-UNCERTAIN"
+        },
+        {
+          "id": "C",
+          "text": "I'd approach it differently and probably get a better outcome",
+          "group": "REFRAME",
+          "state_update": { "A1_Q3_raw": "C" },
+          "next": "A1-EXIT",
+          "exit_state": "TRANSITIONAL"
+        },
+        {
+          "id": "D",
+          "text": "I'd try to avoid being in that situation again",
+          "group": "AVOIDANT",
+          "state_update": { "A1_Q3_raw": "D" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-AVOIDANT"
+        }
+      ],
+      "branch_logic": "A → VICTIM-STABLE | B → VICTIM-UNCERTAIN | C → TRANSITIONAL | D → VICTIM-AVOIDANT"
+    },
+
+    "A1-Q3e-situational": {
+      "axis": 1,
+      "type": "question",
+      "label": "Situational External — Expectancy Shift",
+      "text": "If the same situation came up again tomorrow, what would you expect?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Same result — the conditions haven't changed",
+          "group": "FATALISTIC",
+          "state_update": { "A1_Q3_raw": "A" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-STABLE"
+        },
+        {
+          "id": "B",
+          "text": "It might go differently — these things are unpredictable",
+          "group": "UNCERTAIN",
+          "state_update": { "A1_Q3_raw": "B" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-UNCERTAIN"
+        },
+        {
+          "id": "C",
+          "text": "I'd approach it differently and probably get a better outcome",
+          "group": "REFRAME",
+          "state_update": { "A1_Q3_raw": "C" },
+          "next": "A1-EXIT",
+          "exit_state": "TRANSITIONAL"
+        },
+        {
+          "id": "D",
+          "text": "I'd try to avoid being in that situation again",
+          "group": "AVOIDANT",
+          "state_update": { "A1_Q3_raw": "D" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-AVOIDANT"
+        }
+      ],
+      "branch_logic": "A → VICTIM-STABLE | B → VICTIM-UNCERTAIN | C → TRANSITIONAL | D → VICTIM-AVOIDANT"
+    },
+
+    "A1-Q3e-personal": {
+      "axis": 1,
+      "type": "question",
+      "label": "Personal External — Agency Awareness",
+      "text": "How much do you think today's outcome could change if you approached it differently next time?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Quite a bit — I see specific things I could do differently",
+          "group": "AGENCY_EMERGING",
+          "state_update": { "A1_Q3_raw": "A" },
+          "next": "A1-EXIT",
+          "exit_state": "TRANSITIONAL"
+        },
+        {
+          "id": "B",
+          "text": "Maybe a little, but the bigger factors are still out of my hands",
+          "group": "PARTIAL",
+          "state_update": { "A1_Q3_raw": "B" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-PARTIAL"
+        },
+        {
+          "id": "C",
+          "text": "Not much — some things just aren't a match for me",
+          "group": "FIXED_EXTERNAL",
+          "state_update": { "A1_Q3_raw": "C" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-STABLE"
+        },
+        {
+          "id": "D",
+          "text": "I haven't really thought about it that way",
+          "group": "UNREFLECTIVE",
+          "state_update": { "A1_Q3_raw": "D" },
+          "next": "A1-EXIT",
+          "exit_state": "VICTIM-UNCERTAIN"
+        }
+      ],
+      "branch_logic": "A → TRANSITIONAL | B → VICTIM-PARTIAL | C → VICTIM-STABLE | D → VICTIM-UNCERTAIN"
+    },
+
+    "A1-EXIT": {
+      "axis": 1,
+      "type": "axis_transition",
+      "text": "Axis 1 complete. Exit state selects Axis 2 entry variant.",
+      "next_axis_entry_map": {
+        "VICTOR-EFFORT":     "A2-Q1-victor-effort",
+        "VICTOR-GROWTH":     "A2-Q1-victor-growth",
+        "FIXED-MINDSET":     "A2-Q1-fixed",
+        "INTERNAL-UNCERTAIN":"A2-Q1-uncertain",
+        "TRANSITIONAL":      "A2-Q1-transitional",
+        "VICTIM-STABLE":     "A2-Q1-victim-stable",
+        "VICTIM-UNCERTAIN":  "A2-Q1-victim-uncertain",
+        "VICTIM-PARTIAL":    "A2-Q1-victim-partial",
+        "VICTIM-AVOIDANT":   "A2-Q1-victim-avoidant"
+      }
+    },
+
+    "A2-Q1-victor-effort": {
+      "axis": 2, "type": "question", "variant_for": "VICTOR-EFFORT",
+      "text": "You pushed hard today. When you did — who else benefited from that effort besides yourself?",
+      "options": [
+        { "id": "A", "text": "I stepped in without being asked — it felt natural", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "I helped, but only after I finished what I was already doing", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "I noticed but stayed focused on my own work — it wasn't my responsibility", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "I didn't really notice anyone needing anything today", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-victor-growth": {
+      "axis": 2, "type": "question", "variant_for": "VICTOR-GROWTH",
+      "text": "You stayed open to feedback today. Did that openness create space for anyone else around you?",
+      "options": [
+        { "id": "A", "text": "Yes — I encouraged others to share their views too", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "Somewhat — I was focused on my own growth but stayed collaborative", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "Not really — I was working on myself today", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "I didn't think about it in relation to others", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-fixed": {
+      "axis": 2, "type": "question", "variant_for": "FIXED-MINDSET",
+      "text": "You owned today's outcomes. Was there a moment where someone else's outcome was also in your hands?",
+      "options": [
+        { "id": "A", "text": "Yes — and I took that seriously", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "Maybe — I helped where I could but kept my main focus", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "I don't think so — everyone manages their own outcomes", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "I wasn't thinking about others' outcomes today", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-uncertain": {
+      "axis": 2, "type": "question", "variant_for": "INTERNAL-UNCERTAIN",
+      "text": "Even on uncertain days, people still give. What did you put in today that wasn't required of you?",
+      "options": [
+        { "id": "A", "text": "I helped someone even though I had my own pressure to deal with", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "I did a bit extra but stayed close to what was needed", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "I focused on getting through my own tasks — that felt like enough", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "Honestly nothing extra — today was about survival", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-transitional": {
+      "axis": 2, "type": "question", "variant_for": "TRANSITIONAL",
+      "text": "You showed more agency than you might have given yourself credit for. Did any of that agency go toward someone else?",
+      "options": [
+        { "id": "A", "text": "Yes — I used what I had to make things easier for someone around me", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "A little — I stayed collaborative even when things were hard", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "Not really — I was focused on managing my own situation", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "I didn't have bandwidth to think about others today", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-victim-stable": {
+      "axis": 2, "type": "question", "variant_for": "VICTIM-STABLE",
+      "text": "Today felt largely outside your control. Was there anything — however small — that you chose to give anyway?",
+      "options": [
+        { "id": "A", "text": "Yes — I still showed up for someone even when things were hard", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "I tried to — it was small but I made the effort", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "Not really — I was just trying to get through the day", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "No — I had nothing left to give today", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-victim-uncertain": {
+      "axis": 2, "type": "question", "variant_for": "VICTIM-UNCERTAIN",
+      "text": "On days that feel unpredictable, it's easy to go inward. Did anyone else cross your mind today?",
+      "options": [
+        { "id": "A", "text": "Yes — I checked in on someone or offered help", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "Someone came to mind but I wasn't sure how to help", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "Not really — I was caught in my own head today", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "No — today was hard enough to navigate alone", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-victim-partial": {
+      "axis": 2, "type": "question", "variant_for": "VICTIM-PARTIAL",
+      "text": "Some things were in your control today, some weren't. In the parts that were — did anyone else factor into your decisions?",
+      "options": [
+        { "id": "A", "text": "Yes — I thought about how my choices would affect others", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "A little — I tried to be considerate where I could", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "Not consciously — I was focused on solving my own piece", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "No — I was managing what I could and that was enough", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q1-victim-avoidant": {
+      "axis": 2, "type": "question", "variant_for": "VICTIM-AVOIDANT",
+      "text": "Avoiding difficult situations is a real response. Was there a moment today where you stayed present for someone else even when it was uncomfortable?",
+      "options": [
+        { "id": "A", "text": "Yes — I pushed through discomfort to support someone", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "A", "A2_mode": "PROACTIVE" }, "next": "A2-Q2c" },
+        { "id": "B", "text": "I tried — it wasn't easy but I made the effort", "group": "CONTRIBUTION", "state_update": { "A2_Q1_raw": "B", "A2_mode": "CONDITIONAL" }, "next": "A2-Q2c" },
+        { "id": "C", "text": "Not really — I needed to protect my own space today", "group": "ENTITLEMENT", "state_update": { "A2_Q1_raw": "C", "A2_mode": "SELF_FOCUSED" }, "next": "A2-Q2e" },
+        { "id": "D", "text": "No — I kept to myself as much as possible", "group": "UNAWARE", "state_update": { "A2_Q1_raw": "D", "A2_mode": "UNAWARE" }, "next": "A2-Q2e" }
+      ],
+      "branch_logic": "A+B → A2-Q2c | C+D → A2-Q2e"
+    },
+
+    "A2-Q2c": {
+      "axis": 2, "type": "question",
+      "label": "Contribution Branch — Motivation Probe",
+      "text": "When you helped or contributed today, what was honestly driving it?",
+      "options": [
+        { "id": "A", "text": "I genuinely wanted the other person or team to succeed", "group": "ALTRUISTIC", "state_update": { "A2_Q2_raw": "A", "A2_motivation": "ALTRUISTIC" }, "next": "A2-Q3c-deep" },
+        { "id": "B", "text": "It felt like the right thing to do in the moment", "group": "ALTRUISTIC", "state_update": { "A2_Q2_raw": "B", "A2_motivation": "NORMATIVE_POSITIVE" }, "next": "A2-Q3c-deep" },
+        { "id": "C", "text": "I knew it would reflect well on me or strengthen a relationship", "group": "STRATEGIC", "state_update": { "A2_Q2_raw": "C", "A2_motivation": "STRATEGIC" }, "next": "A2-Q3c-strategic" },
+        { "id": "D", "text": "It was expected of me — not helping would have looked bad", "group": "NORMATIVE", "state_update": { "A2_Q2_raw": "D", "A2_motivation": "OBLIGATORY" }, "next": "A2-Q3e" }
+      ],
+      "branch_logic": "A+B → A2-Q3c-deep | C → A2-Q3c-strategic | D → A2-Q3e"
+    },
+
+    "A2-Q3c-deep": {
+      "axis": 2, "type": "question",
+      "label": "Altruistic Branch — Invisible Effort",
+      "text": "Did you do anything today that no one will notice or credit you for?",
+      "options": [
+        { "id": "A", "text": "Yes — and that's fine, it still mattered", "group": "PURE_OCB", "state_update": { "A2_Q3_raw": "A", "A2_recognition_need": "LOW" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-DEEP" },
+        { "id": "B", "text": "Yes, but I'll admit I noticed that it went unrecognized", "group": "AWARE_OCB", "state_update": { "A2_Q3_raw": "B", "A2_recognition_need": "MILD" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-AWARE" },
+        { "id": "C", "text": "No, but not intentionally — it just didn't come up", "group": "SITUATIONAL", "state_update": { "A2_Q3_raw": "C", "A2_recognition_need": "NEUTRAL" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-SITUATIONAL" },
+        { "id": "D", "text": "Probably not — I tend to focus on what I'm accountable for", "group": "BOUNDED", "state_update": { "A2_Q3_raw": "D", "A2_recognition_need": "BOUNDED" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-BOUNDED" }
+      ],
+      "branch_logic": "A → CONTRIBUTOR-DEEP | B → CONTRIBUTOR-AWARE | C → CONTRIBUTOR-SITUATIONAL | D → CONTRIBUTOR-BOUNDED"
+    },
+
+    "A2-Q3c-strategic": {
+      "axis": 2, "type": "question",
+      "label": "Strategic Branch — Recognition Response",
+      "text": "When your contribution today wasn't acknowledged, how did you feel?",
+      "options": [
+        { "id": "A", "text": "Neutral — the outcome mattered more than the credit", "group": "REFRAMED", "state_update": { "A2_Q3_raw": "A", "A2_recognition_need": "LOW" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-DEEP" },
+        { "id": "B", "text": "Mildly disappointed but I moved on", "group": "MANAGED", "state_update": { "A2_Q3_raw": "B", "A2_recognition_need": "MILD" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-AWARE" },
+        { "id": "C", "text": "It bothered me more than I'd like to admit", "group": "ENTITLEMENT_EMERGING", "state_update": { "A2_Q3_raw": "C", "A2_recognition_need": "HIGH" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-AWARE" },
+        { "id": "D", "text": "I made sure it was acknowledged before the day ended", "group": "ENTITLEMENT_ACTIVE", "state_update": { "A2_Q3_raw": "D", "A2_recognition_need": "ACTIVE" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-ACTIVE" }
+      ],
+      "branch_logic": "A → CONTRIBUTOR-DEEP | B → CONTRIBUTOR-AWARE | C → ENTITLEMENT-AWARE | D → ENTITLEMENT-ACTIVE"
+    },
+
+    "A2-Q2e": {
+      "axis": 2, "type": "question",
+      "label": "Entitlement Branch — Subtype Identification",
+      "text": "Thinking about today — which of these thoughts crossed your mind at any point?",
+      "options": [
+        { "id": "A", "text": "I felt my effort wasn't being fairly recognized compared to others", "group": "RECOGNITION", "state_update": { "A2_Q2_raw": "A", "A2_entitlement_type": "RECOGNITION" }, "next": "A2-Q3e-recognition" },
+        { "id": "B", "text": "I wondered if I was being given work that was beneath my level", "group": "RECOGNITION", "state_update": { "A2_Q2_raw": "B", "A2_entitlement_type": "STATUS" }, "next": "A2-Q3e-recognition" },
+        { "id": "C", "text": "I felt like I was carrying more than my fair share", "group": "EFFORT", "state_update": { "A2_Q2_raw": "C", "A2_entitlement_type": "MARTYRDOM" }, "next": "A2-Q3e-effort" },
+        { "id": "D", "text": "None of these — I just wasn't thinking about others much today", "group": "AWARENESS", "state_update": { "A2_Q2_raw": "D", "A2_entitlement_type": "LOW_AWARENESS" }, "next": "A2-Q3e-awareness" }
+      ],
+      "branch_logic": "A+B → A2-Q3e-recognition | C → A2-Q3e-effort | D → A2-Q3e-awareness"
+    },
+
+    "A2-Q3e-recognition": {
+      "axis": 2, "type": "question",
+      "label": "Recognition Entitlement — Behavioral Response",
+      "text": "When a colleague received recognition today that you felt you deserved equally or more, what did you do?",
+      "options": [
+        { "id": "A", "text": "Nothing — their recognition didn't affect mine", "group": "REFRAME", "state_update": { "A2_Q3_raw": "A" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-AWARE" },
+        { "id": "B", "text": "I felt it but kept it to myself and refocused", "group": "MANAGED", "state_update": { "A2_Q3_raw": "B" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-AWARE" },
+        { "id": "C", "text": "I brought up my own contributions in a later conversation", "group": "ACTIVE", "state_update": { "A2_Q3_raw": "C" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-ACTIVE" },
+        { "id": "D", "text": "It genuinely affected my motivation for the rest of the day", "group": "DEEP", "state_update": { "A2_Q3_raw": "D" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-DEEP" }
+      ],
+      "branch_logic": "A+B → ENTITLEMENT-AWARE | C → ENTITLEMENT-ACTIVE | D → ENTITLEMENT-DEEP"
+    },
+
+    "A2-Q3e-effort": {
+      "axis": 2, "type": "question",
+      "label": "Martyrdom Branch — Effort Response Under Inequity",
+      "text": "You felt you were carrying more than your share today. Did that change how much effort you put in?",
+      "options": [
+        { "id": "A", "text": "No — I kept the same standard regardless", "group": "MAINTAINED", "state_update": { "A2_Q3_raw": "A" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-AWARE" },
+        { "id": "B", "text": "I pulled back slightly to match what others were doing", "group": "REDUCED", "state_update": { "A2_Q3_raw": "B" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-ACTIVE" },
+        { "id": "C", "text": "I pushed through but felt resentful about it", "group": "RESENTFUL", "state_update": { "A2_Q3_raw": "C" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-MARTYR" },
+        { "id": "D", "text": "I raised it with someone rather than letting it build", "group": "ASSERTED", "state_update": { "A2_Q3_raw": "D" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-BOUNDED" }
+      ],
+      "branch_logic": "A → CONTRIBUTOR-AWARE | B → ENTITLEMENT-ACTIVE | C → ENTITLEMENT-MARTYR | D → CONTRIBUTOR-BOUNDED"
+    },
+
+    "A2-Q3e-awareness": {
+      "axis": 2, "type": "question",
+      "label": "Low Awareness Branch — Noticing Probe",
+      "text": "Today, was there a moment where a colleague was struggling and you were aware of it?",
+      "options": [
+        { "id": "A", "text": "Yes — and I checked in or offered something", "group": "ACTED", "state_update": { "A2_Q3_raw": "A" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-SITUATIONAL" },
+        { "id": "B", "text": "Yes — but I assumed they'd handle it or ask if they needed help", "group": "PASSIVE", "state_update": { "A2_Q3_raw": "B" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-AWARE" },
+        { "id": "C", "text": "I'm not sure — I was pretty heads-down today", "group": "LOW_RADIUS", "state_update": { "A2_Q3_raw": "C" }, "next": "A2-EXIT", "exit_state": "LOW-AWARENESS" },
+        { "id": "D", "text": "Not that I noticed", "group": "LOW_RADIUS", "state_update": { "A2_Q3_raw": "D" }, "next": "A2-EXIT", "exit_state": "LOW-AWARENESS" }
+      ],
+      "branch_logic": "A → CONTRIBUTOR-SITUATIONAL | B → ENTITLEMENT-AWARE | C+D → LOW-AWARENESS"
+    },
+
+    "A2-Q3e": {
+      "axis": 2, "type": "question",
+      "label": "Obligatory Contribution — Feeling Probe",
+      "text": "When you contributed out of obligation today, how did you feel about the lack of acknowledgment?",
+      "options": [
+        { "id": "A", "text": "Fine — I don't need recognition for doing what's expected", "group": "NEUTRAL", "state_update": { "A2_Q3_raw": "A" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-BOUNDED" },
+        { "id": "B", "text": "A little drained — I'd appreciate more acknowledgment", "group": "DRAINED", "state_update": { "A2_Q3_raw": "B" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-AWARE" },
+        { "id": "C", "text": "Frustrated — if it's expected, it should at least be appreciated", "group": "FRUSTRATED", "state_update": { "A2_Q3_raw": "C" }, "next": "A2-EXIT", "exit_state": "ENTITLEMENT-ACTIVE" },
+        { "id": "D", "text": "I'm not sure — I didn't think much about it either way", "group": "UNAWARE", "state_update": { "A2_Q3_raw": "D" }, "next": "A2-EXIT", "exit_state": "CONTRIBUTOR-SITUATIONAL" }
+      ],
+      "branch_logic": "A → CONTRIBUTOR-BOUNDED | B → ENTITLEMENT-AWARE | C → ENTITLEMENT-ACTIVE | D → CONTRIBUTOR-SITUATIONAL"
+    },
+
+    "A2-EXIT": {
+      "axis": 2,
+      "type": "axis_transition",
+      "text": "Axis 2 complete. Exit state selects Axis 3 entry variant.",
+      "next_axis_entry_map": {
+        "CONTRIBUTOR-DEEP":        "A3-Q1-contributor-deep",
+        "CONTRIBUTOR-AWARE":       "A3-Q1-contributor-aware",
+        "CONTRIBUTOR-SITUATIONAL": "A3-Q1-contributor-situational",
+        "CONTRIBUTOR-BOUNDED":     "A3-Q1-contributor-bounded",
+        "ENTITLEMENT-AWARE":       "A3-Q1-entitlement-aware",
+        "ENTITLEMENT-ACTIVE":      "A3-Q1-entitlement-active",
+        "ENTITLEMENT-MARTYR":      "A3-Q1-entitlement-martyr",
+        "ENTITLEMENT-DEEP":        "A3-Q1-entitlement-deep",
+        "LOW-AWARENESS":           "A3-Q1-low-awareness"
+      }
+    },
+
+    "A3-Q1-contributor-deep":        { "axis": 3, "type": "question", "variant_for": "CONTRIBUTOR-DEEP",        "text": "You gave today without keeping score. When you were giving — whose face or situation were you holding in mind?",                                          "options": [ { "id": "A", "text": "A specific colleague — I knew exactly who I was helping",         "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "A", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "B", "text": "My team generally — I was thinking about all of us",                  "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "A customer or end user I may never meet",                              "group": "MISSION",       "state_update": { "A3_Q1_raw": "C", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "D", "text": "No one specific — it was more about doing the right thing",              "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "PRINCIPLED"   }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-contributor-aware":       { "axis": 3, "type": "question", "variant_for": "CONTRIBUTOR-AWARE",       "text": "You contributed meaningfully today. Did your thinking extend beyond the people immediately around you?",                                              "options": [ { "id": "A", "text": "Yes — I thought about someone specific outside my immediate team",   "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "A", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "B", "text": "Mostly within my team — that felt like the right scope",               "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "Yes — I thought about who the work ultimately serves",                  "group": "MISSION",       "state_update": { "A3_Q1_raw": "C", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "D", "text": "Not really — I was focused on what was in front of me",                 "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-contributor-situational": { "axis": 3, "type": "question", "variant_for": "CONTRIBUTOR-SITUATIONAL", "text": "Is there someone further from you — a customer, an end user — who was affected by your work today without you directly seeing it?",              "options": [ { "id": "A", "text": "Yes — I can trace my work to a specific person or group",             "group": "MISSION",       "state_update": { "A3_Q1_raw": "A", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "B", "text": "Probably — but I don't often think about it that way",                 "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "Maybe — it's hard to see the connection from where I sit",              "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "C", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "D", "text": "I honestly hadn't thought about it",                                    "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-contributor-bounded":     { "axis": 3, "type": "question", "variant_for": "CONTRIBUTOR-BOUNDED",     "text": "You contributed within your lane today. Was there anyone outside that lane who your work quietly touched?",                                         "options": [ { "id": "A", "text": "Yes — I can see how my work connects to someone beyond my team",      "group": "MISSION",       "state_update": { "A3_Q1_raw": "A", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "B", "text": "Possibly — there are people downstream I don't always think about",    "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "Within my immediate team, yes",                                        "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "C", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "D", "text": "I stay focused on what's assigned — connections beyond that are unclear", "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-entitlement-aware":       { "axis": 3, "type": "question", "variant_for": "ENTITLEMENT-AWARE",       "text": "Some frustration is natural. In the moments between that frustration — did anyone else's reality enter your thinking?",                              "options": [ { "id": "A", "text": "Yes — I noticed someone else having a harder time than me",           "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "A", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "B", "text": "I thought about how the team was feeling overall",                    "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "I thought about who ultimately depends on us getting this right",       "group": "MISSION",       "state_update": { "A3_Q1_raw": "C", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "D", "text": "Mostly not — I was working through my own experience",                  "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-entitlement-active":      { "axis": 3, "type": "question", "variant_for": "ENTITLEMENT-ACTIVE",      "text": "Today had moments of friction around recognition. Separate from that — who depended on your work today, even invisibly?",                           "options": [ { "id": "A", "text": "A colleague who needed what I produced to do their own work",         "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "A", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "B", "text": "The team — our outputs are interconnected",                             "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "Customers or stakeholders I don't interact with directly",              "group": "MISSION",       "state_update": { "A3_Q1_raw": "C", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "D", "text": "I'm not sure — I don't always see who depends on me downstream",         "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-entitlement-martyr":      { "axis": 3, "type": "question", "variant_for": "ENTITLEMENT-MARTYR",      "text": "You carried a lot today. Before we close — was there one person who had it harder than you, that you noticed?",                                    "options": [ { "id": "A", "text": "Yes — and I actually thought about what they were dealing with",      "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "A", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "B", "text": "I noticed the team was stretched — not just me",                       "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "I thought about who we're all ultimately doing this for",               "group": "MISSION",       "state_update": { "A3_Q1_raw": "C", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "D", "text": "Honestly, I was too absorbed in my own load to notice",                 "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-entitlement-deep":        { "axis": 3, "type": "question", "variant_for": "ENTITLEMENT-DEEP",        "text": "Today was heavy. Even so — is there one person whose day was made even slightly better because you showed up?",                                     "options": [ { "id": "A", "text": "Yes — I can name them",                                                  "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "A", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "B", "text": "Probably someone on the team, though I'm not sure who",                "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "Someone downstream — my work matters even when it doesn't feel like it", "group": "MISSION",       "state_update": { "A3_Q1_raw": "C", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "D", "text": "I'm not sure anyone's day was different because of me today",           "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+    "A3-Q1-low-awareness":           { "axis": 3, "type": "question", "variant_for": "LOW-AWARENESS",           "text": "You were heads-down today — that's real work. If your work today had a ripple effect, who do you think felt it first?",                            "options": [ { "id": "A", "text": "A specific colleague who depends on my output",                        "group": "INTERPERSONAL", "state_update": { "A3_Q1_raw": "A", "A3_radius": "INTERPERSONAL" }, "next": "A3-Q2" }, { "id": "B", "text": "The team — we're all connected whether we see it or not",              "group": "TEAM",          "state_update": { "A3_Q1_raw": "B", "A3_radius": "TEAM"          }, "next": "A3-Q2" }, { "id": "C", "text": "Customers or users I don't interact with directly",                     "group": "MISSION",       "state_update": { "A3_Q1_raw": "C", "A3_radius": "MISSION"       }, "next": "A3-Q2" }, { "id": "D", "text": "I genuinely don't know — the connection isn't visible from where I sit",  "group": "SELF",          "state_update": { "A3_Q1_raw": "D", "A3_radius": "SELF"          }, "next": "A3-Q2" } ], "branch_logic": "All → A3-Q2 (radius stored in state)" },
+
+    "A3-Q2": {
+      "axis": 3, "type": "question",
+      "label": "Radius Confirmation — Whose Reality Entered Your Mind",
+      "text": "During today, whose situation genuinely entered your mind — not just as a task, but as a person?",
+      "options": [
+        { "id": "A", "text": "A specific colleague — I was aware of what they were dealing with",        "group": "INTERPERSONAL", "state_update": { "A3_Q2_raw": "A", "A3_radius_confirmed": "INTERPERSONAL" }, "next": "A3-Q3a" },
+        { "id": "B", "text": "My team generally — I was thinking about how we were doing collectively", "group": "TEAM",          "state_update": { "A3_Q2_raw": "B", "A3_radius_confirmed": "TEAM"          }, "next": "A3-Q3b" },
+        { "id": "C", "text": "A customer or end user — I thought about how my work lands for them",     "group": "MISSION",       "state_update": { "A3_Q2_raw": "C", "A3_radius_confirmed": "MISSION"       }, "next": "A3-Q3c" },
+        { "id": "D", "text": "Mostly just my own work and what I needed to get done",                   "group": "SELF",          "state_update": { "A3_Q2_raw": "D", "A3_radius_confirmed": "SELF"          }, "next": "A3-Q3d" }
+      ],
+      "branch_logic": "A → A3-Q3a | B → A3-Q3b | C → A3-Q3c | D → A3-Q3d"
+    },
+
+    "A3-Q3a": {
+      "axis": 3, "type": "question",
+      "label": "Interpersonal Radius — Empathy vs Sympathy",
+      "text": "When that person crossed your mind — what did you do with that awareness?",
+      "options": [
+        { "id": "A", "text": "I reached out or did something concrete for them",             "group": "ACTION_EMPATHY",  "state_update": { "A3_Q3_raw": "A", "A3_empathy_type": "ACTION"       }, "next": "A3-Q4-depth" },
+        { "id": "B", "text": "I held it in mind but didn't act — I wasn't sure if I should", "group": "AWARE_HESITANT",  "state_update": { "A3_Q3_raw": "B", "A3_empathy_type": "HESITANT"     }, "next": "A3-Q4-depth" },
+        { "id": "C", "text": "I noted it but stayed focused on my own work",                 "group": "COGNITIVE_ONLY",  "state_update": { "A3_Q3_raw": "C", "A3_empathy_type": "COGNITIVE"    }, "next": "A3-EXIT", "exit_state": "RADIUS-INTERPERSONAL-PASSIVE" },
+        { "id": "D", "text": "I felt for them but assumed they'd be fine",                   "group": "SYMPATHY",        "state_update": { "A3_Q3_raw": "D", "A3_empathy_type": "SYMPATHY"     }, "next": "A3-EXIT", "exit_state": "RADIUS-INTERPERSONAL-SYMPATHY" }
+      ],
+      "branch_logic": "A+B → A3-Q4-depth | C → RADIUS-INTERPERSONAL-PASSIVE | D → RADIUS-INTERPERSONAL-SYMPATHY",
+      "note": "Batson 2011 — empathy involves modeling the other's reality and responding. D is sympathy (feeling for, not with)."
+    },
+
+    "A3-Q3b": {
+      "axis": 3, "type": "question",
+      "label": "Team Radius — Orientation Frame",
+      "text": "When you thought about the team today, what was the frame?",
+      "options": [
+        { "id": "A", "text": "I was thinking about what the team needed to succeed collectively",                   "group": "COLLECTIVE",     "state_update": { "A3_Q3_raw": "A", "A3_team_frame": "COLLECTIVE"    }, "next": "A3-Q4-depth" },
+        { "id": "B", "text": "I was aware of the team's mood or energy and how it affected the work",             "group": "SOCIAL_AWARE",   "state_update": { "A3_Q3_raw": "B", "A3_team_frame": "SOCIAL"        }, "next": "A3-Q4-depth" },
+        { "id": "C", "text": "I was thinking about my role within the team and how I was performing",             "group": "SELF_FILTERED",  "state_update": { "A3_Q3_raw": "C", "A3_team_frame": "SELF_FILTERED" }, "next": "A3-EXIT", "exit_state": "RADIUS-TEAM-SELFFILTERED" },
+        { "id": "D", "text": "I thought about the team mostly in relation to what I needed from them",            "group": "INSTRUMENTAL",   "state_update": { "A3_Q3_raw": "D", "A3_team_frame": "INSTRUMENTAL"  }, "next": "A3-EXIT", "exit_state": "RADIUS-SELF-INSTRUMENTAL" }
+      ],
+      "branch_logic": "A+B → A3-Q4-depth | C → RADIUS-TEAM-SELFFILTERED | D → RADIUS-SELF-INSTRUMENTAL"
+    },
+
+    "A3-Q3c": {
+      "axis": 3, "type": "question",
+      "label": "Mission Radius — Transcendence Trigger",
+      "text": "When you thought about the customer or end user today, what triggered it?",
+      "options": [
+        { "id": "A", "text": "I naturally think about them — it's part of how I approach my work",       "group": "INTRINSIC",        "state_update": { "A3_Q3_raw": "A", "A3_trigger": "INTRINSIC" }, "next": "A3-EXIT", "exit_state": "RADIUS-MISSION-DEEP" },
+        { "id": "B", "text": "A specific moment made me stop and consider their experience",              "group": "TRIGGERED",        "state_update": { "A3_Q3_raw": "B", "A3_trigger": "MOMENT"    }, "next": "A3-Q4-depth" },
+        { "id": "C", "text": "Someone else brought them up and it shifted my thinking",                  "group": "SOCIAL_ACTIVATED", "state_update": { "A3_Q3_raw": "C", "A3_trigger": "SOCIAL"    }, "next": "A3-EXIT", "exit_state": "RADIUS-MISSION-EMERGING" },
+        { "id": "D", "text": "I thought about them in terms of metrics or outcomes, not as a person",    "group": "ABSTRACTED",       "state_update": { "A3_Q3_raw": "D", "A3_trigger": "ABSTRACT"  }, "next": "A3-EXIT", "exit_state": "RADIUS-TEAM-SELFFILTERED" }
+      ],
+      "branch_logic": "A → RADIUS-MISSION-DEEP | B → A3-Q4-depth | C → RADIUS-MISSION-EMERGING | D → RADIUS-TEAM-SELFFILTERED",
+      "note": "A = Maslow self-transcendence as default orientation. B = peak experience moment (Maslow)."
+    },
+
+    "A3-Q3d": {
+      "axis": 3, "type": "question",
+      "label": "Self Radius — Focus Cause",
+      "text": "You were focused on your own work today. What was driving that focus?",
+      "options": [
+        { "id": "A", "text": "I had a lot to deliver and the pressure was real",                        "group": "CIRCUMSTANTIAL", "state_update": { "A3_Q3_raw": "A", "A3_self_cause": "PRESSURE"    }, "next": "A3-EXIT", "exit_state": "RADIUS-SELF-CIRCUMSTANTIAL" },
+        { "id": "B", "text": "That's generally how I work — I focus on my own output",                  "group": "HABITUAL",       "state_update": { "A3_Q3_raw": "B", "A3_self_cause": "HABIT"       }, "next": "A3-Q4-reframe" },
+        { "id": "C", "text": "I wasn't aware of much beyond my immediate tasks",                        "group": "UNAWARE",        "state_update": { "A3_Q3_raw": "C", "A3_self_cause": "UNAWARENESS" }, "next": "A3-Q4-reframe" },
+        { "id": "D", "text": "I prefer to stay in my lane — others can manage their own work",          "group": "DELIBERATE",     "state_update": { "A3_Q3_raw": "D", "A3_self_cause": "DELIBERATE"  }, "next": "A3-EXIT", "exit_state": "RADIUS-SELF-DELIBERATE" }
+      ],
+      "branch_logic": "A → RADIUS-SELF-CIRCUMSTANTIAL | B+C → A3-Q4-reframe | D → RADIUS-SELF-DELIBERATE",
+      "note": "A = overwhelm not selfishness. D = philosophical. B+C need prompted reframe."
+    },
+
+    "A3-Q4-depth": {
+      "axis": 3, "type": "question",
+      "label": "Depth Probe — Impact Localization",
+      "text": "If your work today disappeared — was never done — who would have felt that absence most?",
+      "note": "Most powerful question in the axis — forces the employee to locate their work's meaning in another person's experience.",
+      "options": [
+        { "id": "A", "text": "A specific person I can name",                                       "group": "NAMED",        "state_update": { "A3_Q4_raw": "A", "A3_impact": "NAMED",        "A3_named_person": true  }, "next": "A3-EXIT", "exit_state": "RADIUS-INTERPERSONAL-DEEP" },
+        { "id": "B", "text": "My team or a group of people",                                       "group": "COLLECTIVE",   "state_update": { "A3_Q4_raw": "B", "A3_impact": "COLLECTIVE",   "A3_named_person": false }, "next": "A3-EXIT", "exit_state": "RADIUS-TEAM-DEEP" },
+        { "id": "C", "text": "Customers or people I don't directly interact with",                 "group": "TRANSCENDENT", "state_update": { "A3_Q4_raw": "C", "A3_impact": "TRANSCENDENT", "A3_named_person": false }, "next": "A3-EXIT", "exit_state": "RADIUS-MISSION-DEEP" },
+        { "id": "D", "text": "Honestly, I'm not sure — I haven't thought about it that way",       "group": "UNAWARE",      "state_update": { "A3_Q4_raw": "D", "A3_impact": "UNAWARE",      "A3_named_person": false }, "next": "A3-EXIT", "exit_state": "RADIUS-EMERGING" }
+      ],
+      "branch_logic": "A → RADIUS-INTERPERSONAL-DEEP | B → RADIUS-TEAM-DEEP | C → RADIUS-MISSION-DEEP | D → RADIUS-EMERGING"
+    },
+
+    "A3-Q4-reframe": {
+      "axis": 3, "type": "question",
+      "label": "Reframe Probe — Prompted Transcendence",
+      "text": "Think about one person — inside or outside the company — whose day was different because you showed up today. Who comes closest?",
+      "options": [
+        { "id": "A", "text": "A colleague I directly worked with",                                          "group": "EMERGING", "state_update": { "A3_Q4_raw": "A", "A3_transcendence": "PROMPTED_INTERPERSONAL" }, "next": "A3-EXIT", "exit_state": "RADIUS-EMERGING" },
+        { "id": "B", "text": "Someone I helped even briefly",                                               "group": "EMERGING", "state_update": { "A3_Q4_raw": "B", "A3_transcendence": "PROMPTED_BRIEF"         }, "next": "A3-EXIT", "exit_state": "RADIUS-EMERGING" },
+        { "id": "C", "text": "I'm not sure anyone's day was different because of me today",                 "group": "NONE",     "state_update": { "A3_Q4_raw": "C", "A3_transcendence": "NONE"                   }, "next": "A3-EXIT", "exit_state": "RADIUS-SELF-DEEP" },
+        { "id": "D", "text": "Someone who will feel the effect of my work later, not today",                "group": "DELAYED",  "state_update": { "A3_Q4_raw": "D", "A3_transcendence": "DELAYED_MISSION"         }, "next": "A3-EXIT", "exit_state": "RADIUS-MISSION-EMERGING" }
+      ],
+      "branch_logic": "A+B → RADIUS-EMERGING | C → RADIUS-SELF-DEEP | D → RADIUS-MISSION-EMERGING",
+      "note": "A+B: self-focused person found someone when prompted — celebrate in summary."
+    },
+
+    "A3-EXIT": {
+      "axis": 3,
+      "type": "axis_transition",
+      "text": "Axis 3 complete. All three axes done. Proceed to summary generation.",
+      "exit_states": [
+        "RADIUS-MISSION-DEEP", "RADIUS-MISSION-EMERGING",
+        "RADIUS-TEAM-DEEP", "RADIUS-INTERPERSONAL-DEEP",
+        "RADIUS-INTERPERSONAL-SYMPATHY", "RADIUS-INTERPERSONAL-PASSIVE",
+        "RADIUS-TEAM-SELFFILTERED", "RADIUS-SELF-INSTRUMENTAL",
+        "RADIUS-SELF-CIRCUMSTANTIAL", "RADIUS-SELF-DELIBERATE",
+        "RADIUS-SELF-DEEP", "RADIUS-EMERGING"
+      ],
+      "next": "SUMMARY"
+    },
+
+    "SUMMARY": {
+      "type": "terminal",
+      "text": "Final node. Reflection summary generated from full accumulated state. See reflections.json for interpolated templates.",
+      "state_used": [
+        "A1_branch", "A1_attribution", "A1_expectancy", "A1_feedback_orientation",
+        "A1_exit_state",
+        "A2_mode", "A2_motivation", "A2_recognition_need", "A2_entitlement_type",
+        "A2_exit_state",
+        "A3_radius", "A3_radius_confirmed", "A3_empathy_type", "A3_impact", "A3_named_person",
+        "A3_exit_state"
+      ]
+    }
+
+  }
+}

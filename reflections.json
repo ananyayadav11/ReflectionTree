@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "description": "Interpolated reflection templates. Placeholders in {curly_braces} are filled from accumulated state at runtime. No AI generation — fully deterministic.",
+    "placeholder_reference": {
+      "{A1_exit}":       "Axis 1 exit state string",
+      "{A2_exit}":       "Axis 2 exit state string",
+      "{A3_exit}":       "Axis 3 exit state string",
+      "{axis1_label}":   "Human-readable Axis 1 summary sentence (from axis_labels.A1)",
+      "{axis2_label}":   "Human-readable Axis 2 summary sentence (from axis_labels.A2)",
+      "{axis3_label}":   "Human-readable Axis 3 summary sentence (from axis_labels.A3)",
+      "{closing_question}": "Closing question selected from closing_questions map (keyed by A1 exit state)"
+    }
+  },
+
+  "axis_labels": {
+    "A1": {
+      "VICTOR-EFFORT":      "You owned today — and your lever was effort.",
+      "VICTOR-GROWTH":      "You owned today — and stayed open to growing through it.",
+      "FIXED-MINDSET":      "You took ownership, but may be underestimating what's still changeable.",
+      "INTERNAL-UNCERTAIN": "You worked hard today, even without certainty about where it leads.",
+      "TRANSITIONAL":       "You found more agency in today than you first gave yourself credit for.",
+      "VICTIM-STABLE":      "Today felt fixed and outside your control.",
+      "VICTIM-UNCERTAIN":   "Today felt unpredictable — hard to know what to hold.",
+      "VICTIM-PARTIAL":     "Today had real constraints, and some genuine agency inside them.",
+      "VICTIM-AVOIDANT":    "Today was uncomfortable enough that avoidance felt like the safer path."
+    },
+    "A2": {
+      "CONTRIBUTOR-DEEP":        "You gave today without keeping score.",
+      "CONTRIBUTOR-AWARE":       "You contributed genuinely — with a small awareness of recognition.",
+      "CONTRIBUTOR-SITUATIONAL": "You contributed when the moment made it easy.",
+      "CONTRIBUTOR-BOUNDED":     "You contributed within your defined lane.",
+      "ENTITLEMENT-AWARE":       "Some entitlement feelings were present — and you managed them.",
+      "ENTITLEMENT-ACTIVE":      "Entitlement shaped some of your behavior today.",
+      "ENTITLEMENT-MARTYR":      "You gave — but kept score while doing it.",
+      "ENTITLEMENT-DEEP":        "Recognition gaps hit hard today and affected how you showed up.",
+      "LOW-AWARENESS":           "Your focus was inward today — others weren't in your frame much."
+    },
+    "A3": {
+      "RADIUS-MISSION-DEEP":           "Your radius reached all the way to the people your work ultimately serves.",
+      "RADIUS-MISSION-EMERGING":       "The mission radius is there — not always your default, but reachable.",
+      "RADIUS-TEAM-DEEP":              "Your frame was the team — collective success over individual performance.",
+      "RADIUS-INTERPERSONAL-DEEP":     "You held a specific person in mind today — and located your impact there.",
+      "RADIUS-INTERPERSONAL-SYMPATHY": "You noticed someone — but stayed at the surface of their experience.",
+      "RADIUS-INTERPERSONAL-PASSIVE":  "You were aware of someone but didn't let that awareness move you.",
+      "RADIUS-TEAM-SELFFILTERED":      "The team was in your thinking, but filtered through your own performance.",
+      "RADIUS-SELF-INSTRUMENTAL":      "Others appeared in your thinking mainly as resources for your work.",
+      "RADIUS-SELF-CIRCUMSTANTIAL":    "Your radius was narrow today — but pressure, not personality, was the cause.",
+      "RADIUS-SELF-DELIBERATE":        "You stayed in your lane by philosophy — others manage their own.",
+      "RADIUS-SELF-DEEP":              "It was hard to find someone whose day was different because of you today.",
+      "RADIUS-EMERGING":               "When prompted, you found someone. That person is real — and it counts."
+    }
+  },
+
+  "summaries": {
+    "VICTOR-EFFORT + CONTRIBUTOR-DEEP + RADIUS-MISSION-DEEP": {
+      "text": "{axis1_label} {axis2_label} And when you look outward, your radius reaches all the way to the people your work ultimately serves — people you may never meet. That combination is rare. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM"
+    },
+    "VICTOR-EFFORT + CONTRIBUTOR-DEEP + RADIUS-TEAM-DEEP": {
+      "text": "{axis1_label} {axis2_label} Your frame today wasn't just personal — it was collective. You worked hard and gave that effort to the team without needing it named. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM"
+    },
+    "VICTOR-EFFORT + CONTRIBUTOR-DEEP + RADIUS-INTERPERSONAL-DEEP": {
+      "text": "{axis1_label} {axis2_label} And you held a specific person in mind while doing it — someone whose situation you genuinely considered. That's not effort for effort's sake. That's effort with a face attached. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM"
+    },
+    "VICTOR-EFFORT + CONTRIBUTOR-AWARE + RADIUS-MISSION-DEEP": {
+      "text": "{axis1_label} {axis2_label} There's a small recognition need present — that's human. But your radius reaches far: you think about the people your work ultimately serves. The tension between wanting acknowledgment and working for something larger is worth sitting with. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM_WITH_NUDGE"
+    },
+    "VICTOR-EFFORT + CONTRIBUTOR-AWARE + RADIUS-TEAM-DEEP": {
+      "text": "{axis1_label} {axis2_label} Your team was in your frame today — collectively, not just instrumentally. The mild recognition need doesn't cancel that. It just means you're human. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM_WITH_NUDGE"
+    },
+    "VICTOR-EFFORT + ENTITLEMENT-AWARE + RADIUS-INTERPERSONAL-DEEP": {
+      "text": "{axis1_label} Some entitlement feelings surfaced today — and you managed them without letting them drive your behavior. Underneath all of it, you held a specific person in mind. That person is the real signal of today. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "REFRAME"
+    },
+    "VICTOR-EFFORT + ENTITLEMENT-ACTIVE + RADIUS-SELF-CIRCUMSTANTIAL": {
+      "text": "{axis1_label} Today, effort and entitlement showed up together — you worked hard and also let recognition gaps affect your behavior. The narrow radius makes sense given the pressure. But the effort was real. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "HONEST_REFRAME"
+    },
+    "VICTOR-GROWTH + CONTRIBUTOR-DEEP + RADIUS-MISSION-DEEP": {
+      "text": "{axis1_label} {axis2_label} {axis3_label} You stayed open, you gave without keeping score, and your thinking reached beyond the room. That's a day worth recognizing — even privately. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM"
+    },
+    "VICTOR-GROWTH + CONTRIBUTOR-AWARE + RADIUS-TEAM-DEEP": {
+      "text": "{axis1_label} {axis2_label} Your frame included the team — not just yourself. A small recognition need is present, but it didn't close the radius. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM_WITH_NUDGE"
+    },
+    "VICTOR-GROWTH + ENTITLEMENT-AWARE + RADIUS-INTERPERSONAL-PASSIVE": {
+      "text": "{axis1_label} You stayed open to feedback — growth-oriented. But someone crossed your mind today and the awareness didn't become action. That gap is worth noticing. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "GENTLE_CHALLENGE"
+    },
+    "FIXED-MINDSET + CONTRIBUTOR-BOUNDED + RADIUS-TEAM-SELFFILTERED": {
+      "text": "{axis1_label} You contributed within your lane — reliably. But the team appeared in your thinking filtered through your own performance. And feedback, when it came, felt less necessary than it might have. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "HONEST_REFRAME"
+    },
+    "FIXED-MINDSET + ENTITLEMENT-ACTIVE + RADIUS-SELF-INSTRUMENTAL": {
+      "text": "{axis1_label} Today's pattern shows ownership of outcomes but resistance to change — and others appearing mostly as resources. That combination is worth examining. It doesn't make today a failure. It makes it data. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "DIRECT_HONEST"
+    },
+    "INTERNAL-UNCERTAIN + CONTRIBUTOR-DEEP + RADIUS-INTERPERSONAL-DEEP": {
+      "text": "{axis1_label} And despite that uncertainty, you gave — and held a specific person in mind while doing it. Contribution despite uncertainty is one of the harder forms of showing up. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM"
+    },
+    "INTERNAL-UNCERTAIN + CONTRIBUTOR-SITUATIONAL + RADIUS-EMERGING": {
+      "text": "{axis1_label} {axis2_label} When asked who your work touched, you found someone. That's not nothing — that's the beginning of a wider frame. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "ENCOURAGE"
+    },
+    "TRANSITIONAL + CONTRIBUTOR-DEEP + RADIUS-MISSION-DEEP": {
+      "text": "{axis1_label} And despite the friction, you gave — and your thinking reached to the people your work ultimately serves. What looked like an external day was actually much more internal than it felt. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "REFRAME_AFFIRM"
+    },
+    "TRANSITIONAL + CONTRIBUTOR-AWARE + RADIUS-TEAM-DEEP": {
+      "text": "{axis1_label} {axis2_label} Your frame included the team — not just yourself. You had more agency today than it felt like. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "ENCOURAGE"
+    },
+    "TRANSITIONAL + ENTITLEMENT-AWARE + RADIUS-INTERPERSONAL-PASSIVE": {
+      "text": "{axis1_label} You found agency when prompted — that's real. But someone crossed your mind today and the awareness stayed internal. The gap between noticing and acting is small — and worth closing tomorrow. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "GENTLE_CHALLENGE"
+    },
+    "VICTIM-STABLE + CONTRIBUTOR-DEEP + RADIUS-INTERPERSONAL-DEEP": {
+      "text": "{axis1_label} And inside all of that, you still gave — and held a specific person in mind. Contribution from a place of constraint is more meaningful than contribution from ease. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM_IN_DIFFICULTY"
+    },
+    "VICTIM-STABLE + ENTITLEMENT-ACTIVE + RADIUS-SELF-CIRCUMSTANTIAL": {
+      "text": "{axis1_label} Today felt fixed — and entitlement behaviors showed up in response. The narrow radius makes sense under pressure. One question worth asking: what, if anything, was yours to choose today? The question worth carrying into tomorrow: {closing_question}",
+      "tone": "CAREFUL_HONEST"
+    },
+    "VICTIM-STABLE + LOW-AWARENESS + RADIUS-SELF-DEEP": {
+      "text": "Today felt outside your control, and your focus stayed internal — others weren't in your frame, and it was hard to find someone whose day was different because of you. That's an honest place to end. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "COMPASSIONATE_DIRECT"
+    },
+    "VICTIM-UNCERTAIN + CONTRIBUTOR-SITUATIONAL + RADIUS-EMERGING": {
+      "text": "{axis1_label} {axis2_label} When prompted, you found someone. That's the thread. Uncertain days make it harder to see — but the connection is there. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "ENCOURAGE"
+    },
+    "VICTIM-PARTIAL + CONTRIBUTOR-AWARE + RADIUS-TEAM-DEEP": {
+      "text": "{axis1_label} Inside those constraints, you contributed — and your frame included the team. The recognition need is mild, and the radius is healthy. Partial agency honestly acknowledged is more useful than full agency falsely claimed. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "AFFIRM_WITH_NUDGE"
+    },
+    "VICTIM-AVOIDANT + CONTRIBUTOR-BOUNDED + RADIUS-SELF-CIRCUMSTANTIAL": {
+      "text": "{axis1_label} You stayed in your lane and managed the pressure. The radius was narrow — but pressure was the cause, not philosophy. Tomorrow, one small moment outside the lane might be worth trying. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "GENTLE_CHALLENGE"
+    },
+    "VICTIM-AVOIDANT + ENTITLEMENT-DEEP + RADIUS-SELF-DEEP": {
+      "text": "Today was heavy — avoidance, deep recognition pain, and a radius that stayed close. That's a lot to carry. The question isn't what went wrong. It's what one thing, tomorrow, could be different. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "COMPASSIONATE_DIRECT"
+    },
+    "DEFAULT": {
+      "text": "Today moved through three layers: how you explained what happened ({axis1_label}), how you showed up for others ({axis2_label}), and how wide your frame of concern reached ({axis3_label}). Each of these is a variable — not a verdict. The question worth carrying into tomorrow: {closing_question}",
+      "tone": "NEUTRAL",
+      "note": "Fallback for any axis combination not explicitly mapped above."
+    }
+  },
+
+  "closing_questions": {
+    "VICTOR-EFFORT":      "Where could that same effort go toward someone who wouldn't expect it from you?",
+    "VICTOR-GROWTH":      "Who else in your team could benefit from the same openness you brought to your own feedback today?",
+    "FIXED-MINDSET":      "What's one thing about how you work that you've assumed is fixed — but might not be?",
+    "INTERNAL-UNCERTAIN": "If effort doesn't guarantee outcome, what makes it worth giving anyway?",
+    "TRANSITIONAL":       "Where was your agency today that you almost missed?",
+    "VICTIM-STABLE":      "What is one thing — however small — that was yours to choose today?",
+    "VICTIM-UNCERTAIN":   "On a day that felt unpredictable, what was the one thing you could anchor to?",
+    "VICTIM-PARTIAL":     "Inside the constraints, what was the smallest real choice you made?",
+    "VICTIM-AVOIDANT":    "What would it have cost you to stay in one uncomfortable moment longer today?"
+  }
+}
